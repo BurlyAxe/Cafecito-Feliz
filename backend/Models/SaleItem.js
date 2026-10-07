@@ -33,7 +33,7 @@ const saleItemSchema = new mongoose.Schema(
             min: 1,
             validate: {
                 validator: Number.isInteger,
-                message: "La cantidad debe ser un número entero",
+                message: "Quantity must be an integer",
             },
         },
 

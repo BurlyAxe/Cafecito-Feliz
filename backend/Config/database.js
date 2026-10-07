@@ -4,15 +4,15 @@ export const connectDB = async () => {
   const uri = process.env.DB_CONNECTION_STRING;
 
   if (!uri) {
-    console.error("❌ Falta DB_CONNECTION_STRING en el archivo .env");
+    console.error("❌ Missing DB_CONNECTION_STRING in the .env file");
     process.exit(1);
   }
 
   try {
     await mongoose.connect(uri);
-    console.log("✅ MongoDB conectado");
+    console.log("✅ MongoDB connected");
   } catch (error) {
-    console.error("❌ Error al conectar con MongoDB:", error.message);
+    console.error("❌ Failed to connect to MongoDB:", error.message);
     process.exit(1);
   }
 };

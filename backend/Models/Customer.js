@@ -20,7 +20,7 @@ const customerSchema = new mongoose.Schema(
             trim: true,
             lowercase: true,
             unique: true,
-            match: [/^\S+@\S+\.\S+$/, "El email no tiene un formato válido"],
+            match: [/^\S+@\S+\.\S+$/, "Email format is not valid"],
         },
 
         purchasesCount:{
