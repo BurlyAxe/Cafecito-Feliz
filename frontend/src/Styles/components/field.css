@@ -1,0 +1,22 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.field__label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.field__control {
+  width: 100%;
+  padding: 10px var(--space-3);
+  border: 1px solid;
+  border-radius: var(--radius-sm);
+}
+
+.field__hint,
+.field__error {
+  font-size: var(--font-size-sm);
+}
