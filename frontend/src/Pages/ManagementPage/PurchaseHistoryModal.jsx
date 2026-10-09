@@ -6,11 +6,10 @@ import { fetchCustomerPurchases } from '../../Api/customersApi.js'
 import {
   formatCurrency,
   formatDateTime,
-  formatFolio,
+  formatDiscount,
+  formatSaleNumber,
   formatPaymentMethod,
 } from '../../Api/format.js'
-
-const MINUS_SIGN = '−'
 
 // Each line uses the name and price saved at the moment of the sale (snapshot),
 // so later catalog changes do not rewrite the history
@@ -18,7 +17,7 @@ function PurchaseCard({ sale }) {
   return (
     <li className="purchase" data-testid="purchase">
       <div className="purchase__header">
-        <span className="purchase__folio">Folio {formatFolio(sale._id)}</span>
+        <span className="purchase__number">Folio {formatSaleNumber(sale._id)}</span>
         <span className="purchase__meta">
           {formatDateTime(sale.createdAt)} · {formatPaymentMethod(sale.paymentMethod)}
         </span>
@@ -46,8 +45,7 @@ function PurchaseCard({ sale }) {
           <div className="purchase__row">
             <dt>Descuento ({sale.discountPercent}%)</dt>
             <dd>
-              {MINUS_SIGN}
-              {formatCurrency(sale.discountAmount)}
+              {formatDiscount(sale.discountAmount)}
             </dd>
           </div>
         )}

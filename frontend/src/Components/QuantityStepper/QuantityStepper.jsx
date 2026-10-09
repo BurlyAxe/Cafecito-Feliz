@@ -1,13 +1,13 @@
 import Icon from '../Icons/Icon.jsx'
 import '../../Styles/components/quantity-stepper.css'
 
-function QuantityStepper({ value, min = 1, onIncrement, onDecrement, disabled = false }) {
+function QuantityStepper({ value, itemName, min = 1, onIncrement, onDecrement, disabled = false }) {
   return (
     <div className="quantity-stepper">
       <button
         type="button"
         className="quantity-stepper__button"
-        aria-label="Quitar uno"
+        aria-label={`Quitar uno de ${itemName}`}
         disabled={disabled || value <= min}
         onClick={onDecrement}
       >
@@ -19,7 +19,7 @@ function QuantityStepper({ value, min = 1, onIncrement, onDecrement, disabled = 
       <button
         type="button"
         className="quantity-stepper__button"
-        aria-label="Agregar uno"
+        aria-label={`Agregar uno de ${itemName}`}
         disabled={disabled}
         onClick={onIncrement}
       >

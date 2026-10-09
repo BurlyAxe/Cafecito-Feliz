@@ -6,4 +6,3 @@ export const quoteCart = ({ customerId, items }, { signal } = {}) =>
 export const createSale = ({ customerId, paymentMethod, items }) =>
   request('/sales', { method: 'POST', body: { customerId, paymentMethod, items } })
 
-export const fetchSale = (id) => request(`/sales/${id}`)

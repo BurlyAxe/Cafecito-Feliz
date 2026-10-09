@@ -3,6 +3,34 @@ import { createPortal } from 'react-dom'
 import Icon from '../Icons/Icon.jsx'
 import '../../Styles/components/modal.css'
 
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',')
+
+// Tab and Shift+Tab cycle inside the dialog instead of reaching the page behind it
+function keepFocusInside(event, dialog) {
+  const focusable = [...dialog.querySelectorAll(FOCUSABLE_SELECTOR)]
+  if (focusable.length === 0) {
+    event.preventDefault()
+    return
+  }
+  const first = focusable[0]
+  const last = focusable[focusable.length - 1]
+  const active = document.activeElement
+  if (event.shiftKey && (active === first || active === dialog)) {
+    event.preventDefault()
+    last.focus()
+  } else if (!event.shiftKey && active === last) {
+    event.preventDefault()
+    first.focus()
+  }
+}
+
 function Modal({ open, title, onClose, children, footer }) {
   const titleId = useId()
   const dialogRef = useRef(null)
@@ -14,13 +42,21 @@ function Modal({ open, title, onClose, children, footer }) {
 
   useEffect(() => {
     if (!open) return undefined
+    // Focus goes back to the element that opened the dialog when it closes
+    const previouslyFocused = document.activeElement
     dialogRef.current?.focus()
 
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') onCloseRef.current?.()
+      else if (event.key === 'Tab' && dialogRef.current) keepFocusInside(event, dialogRef.current)
     }
     document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected) {
+        previouslyFocused.focus()
+      }
+    }
   }, [open])
 
   if (!open) return null

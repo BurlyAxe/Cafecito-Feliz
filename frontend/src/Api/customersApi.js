@@ -3,8 +3,6 @@ import { request } from './client.js'
 export const searchCustomers = ({ search, page = 1, limit = 10 } = {}) =>
   request('/customers', { query: { search, page, limit } })
 
-export const fetchCustomer = (id) => request(`/customers/${id}`)
-
 export const createCustomer = (customer) =>
   request('/customers', { method: 'POST', body: customer })
 

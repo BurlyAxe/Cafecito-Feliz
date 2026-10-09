@@ -121,7 +121,7 @@
   gap: var(--space-1);
 }
 
-.sale-receipt__folio {
+.sale-receipt__number {
   font-size: var(--font-size-lg);
   font-weight: 700;
 }

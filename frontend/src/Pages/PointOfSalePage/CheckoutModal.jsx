@@ -44,7 +44,9 @@ function CheckoutModal({
 
   if (sale) {
     return (
+      // A separate key remounts the dialog, so focus moves to the receipt
       <Modal
+        key="receipt"
         open
         title="Venta registrada"
         onClose={onClose}
@@ -64,6 +66,7 @@ function CheckoutModal({
 
   return (
     <Modal
+      key="payment"
       open
       title="Cobrar orden"
       onClose={posting ? undefined : onClose}

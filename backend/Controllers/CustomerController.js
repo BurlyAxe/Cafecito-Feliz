@@ -5,6 +5,8 @@ import SaleItem from '../Models/SaleItem.js';
 
 const isInvalidId = (id) => !mongoose.Types.ObjectId.isValid(id);
 
+const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const handledClientError = (res, error) => {
     if (error.name === "ValidationError") {
         res.status(400).json({
@@ -31,8 +33,8 @@ export const getCustomers = async (req, res) => {
 
         const filter = {};
 
-        if (search) {
-            const regex = { $regex: search, $options: "i" };
+        if (typeof search === "string" && search) {
+            const regex = { $regex: escapeRegex(search), $options: "i" };
             filter.$or = [{ name: regex }, { email: regex }, { phone: regex }];
         }
 

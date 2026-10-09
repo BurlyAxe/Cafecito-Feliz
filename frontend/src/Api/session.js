@@ -1,7 +1,7 @@
 // Cypress hardcodes these keys in cypress/support/commands.js
-export const SESSION_KEY = 'cafecito.session'
-export const CUSTOMER_KEY = 'cafecito.customer'
-export const CART_KEY = 'cafecito.cart'
+const SESSION_KEY = 'cafecito.session'
+const CUSTOMER_KEY = 'cafecito.customer'
+const CART_KEY = 'cafecito.cart'
 
 function read(key) {
   try {

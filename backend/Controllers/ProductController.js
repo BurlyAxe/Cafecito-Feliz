@@ -4,6 +4,8 @@ import { ROLES, getRole } from "../Middlewares/requireRole.js";
 
 const isInvalidId = (id) => !mongoose.Types.ObjectId.isValid(id);
 
+const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const isStaff = (req) => [ROLES.SELLER, ROLES.ADMIN].includes(getRole(req));
 
 const handledClientError = (res, error) => {
@@ -33,8 +35,8 @@ export const getProducts = async (req, res) => {
 
         const filter = {};
 
-        if (search) {
-            filter.name = { $regex: search, $options: "i" };
+        if (typeof search === "string" && search) {
+            filter.name = { $regex: escapeRegex(search), $options: "i" };
         }
 
         if (!showAll) {

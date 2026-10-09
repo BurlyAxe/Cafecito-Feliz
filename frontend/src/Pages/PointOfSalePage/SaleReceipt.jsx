@@ -1,19 +1,18 @@
 import {
   formatCurrency,
   formatDateTime,
-  formatFolio,
+  formatDiscount,
+  formatSaleNumber,
   formatPaymentMethod,
 } from '../../Api/format.js'
 
-const MINUS_SIGN = '−'
-
 function SaleReceipt({ sale, customerName }) {
-  const folio = formatFolio(sale._id)
+  const saleNumber = formatSaleNumber(sale._id)
 
   return (
     <div className="sale-receipt" data-testid="sale-receipt">
       <div className="sale-receipt__header" role="status">
-        <p className="sale-receipt__folio">Folio {folio}</p>
+        <p className="sale-receipt__number">Folio {saleNumber}</p>
         <p className="sale-receipt__meta">{customerName}</p>
         <p className="sale-receipt__meta">{formatDateTime(sale.createdAt)}</p>
       </div>
@@ -37,8 +36,7 @@ function SaleReceipt({ sale, customerName }) {
         <div className="sale-receipt__row">
           <dt>{sale.discountPercent > 0 ? `Descuento (${sale.discountPercent}%)` : 'Descuento'}</dt>
           <dd>
-            {MINUS_SIGN}
-            {formatCurrency(sale.discountAmount)}
+            {formatDiscount(sale.discountAmount)}
           </dd>
         </div>
         <div className="sale-receipt__row sale-receipt__row--total">

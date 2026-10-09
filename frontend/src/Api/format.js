@@ -12,6 +12,11 @@ export function formatCurrency(amount) {
   return currencyFormatter.format(Number(amount) || 0).replace(/\s/g, '')
 }
 
+// Discounts are shown with a real minus sign: "−$16.10"
+export function formatDiscount(amount) {
+  return `−${formatCurrency(amount)}`
+}
+
 export function formatPhone(phone) {
   const digits = String(phone ?? '')
   if (!/^\d{10}$/.test(digits)) return digits
@@ -36,7 +41,7 @@ export function formatDateTime(iso) {
 }
 
 // Short sale number shown to people: the last 6 characters of the id
-export function formatFolio(id) {
+export function formatSaleNumber(id) {
   return String(id ?? '').slice(-6).toUpperCase()
 }
 

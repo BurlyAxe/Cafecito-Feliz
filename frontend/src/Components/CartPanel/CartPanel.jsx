@@ -2,10 +2,8 @@ import Alert from '../Alert/Alert.jsx'
 import Button from '../Button/Button.jsx'
 import Icon from '../Icons/Icon.jsx'
 import QuantityStepper from '../QuantityStepper/QuantityStepper.jsx'
-import { formatCurrency } from '../../Api/format.js'
+import { formatCurrency, formatDiscount } from '../../Api/format.js'
 import '../../Styles/components/cart-panel.css'
-
-const MINUS_SIGN = '−'
 
 function countLabel(count) {
   return count === 1 ? '1 artículo' : `${count} artículos`
@@ -42,6 +40,7 @@ function CartLine({ item, quoteLine, onIncrement, onDecrement, onRemove }) {
       <div className="cart-line__bottom">
         <QuantityStepper
           value={item.quantity}
+          itemName={item.name}
           onIncrement={() => onIncrement(item.productId)}
           onDecrement={() => onDecrement(item.productId)}
         />
@@ -112,8 +111,7 @@ function CartPanel({
         <div className="cart-panel__row">
           <dt>{discountLabel}</dt>
           <dd>
-            {MINUS_SIGN}
-            {formatCurrency(isEmpty ? 0 : quote?.discountAmount)}
+            {formatDiscount(isEmpty ? 0 : quote?.discountAmount)}
           </dd>
         </div>
         <div className="cart-panel__row cart-panel__row--total">
