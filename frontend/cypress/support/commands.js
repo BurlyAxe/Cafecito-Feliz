@@ -8,7 +8,7 @@ const CREDENTIALS = {
 }
 
 Cypress.Commands.add('resetDb', () => {
-  cy.exec('npm --prefix ../backend run seed', { timeout: 60000 })
+  cy.task('resetDb', null, { timeout: 60000 })
 })
 
 Cypress.Commands.add('apiLogin', (role = 'seller') => {

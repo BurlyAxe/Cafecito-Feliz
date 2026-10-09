@@ -2,7 +2,7 @@ describe('smoke', () => {
   it('redirects to the login page when there is no session', () => {
     cy.visit('/')
     cy.location('pathname').should('eq', '/login')
-    cy.contains('Iniciar sesión').should('be.visible')
+    cy.contains('Inicia sesión para abrir la caja.').should('be.visible')
   })
 
   it('sends a seller away from the management page', () => {
