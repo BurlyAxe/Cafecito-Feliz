@@ -1,0 +1,130 @@
+.cart-panel {
+  position: sticky;
+  top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: var(--cart-width);
+  max-height: calc(100vh - var(--space-6));
+  overflow-y: auto;
+  padding: var(--space-4);
+  border: 1px solid;
+  border-radius: var(--radius-md);
+}
+
+.cart-panel__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.cart-panel__title {
+  font-size: var(--font-size-lg);
+}
+
+.cart-panel__count,
+.cart-panel__note,
+.cart-panel__status {
+  font-size: var(--font-size-sm);
+  opacity: 0.7;
+}
+
+.cart-panel__status:empty {
+  display: none;
+}
+
+.cart-panel__empty {
+  padding: var(--space-5) 0;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.cart-panel__lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cart-line {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid;
+}
+
+.cart-line__top,
+.cart-line__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.cart-line__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-line__name,
+.cart-line__total {
+  font-weight: 600;
+}
+
+.cart-line__unit {
+  font-size: var(--font-size-sm);
+  opacity: 0.7;
+}
+
+.cart-line__remove {
+  display: inline-flex;
+  padding: var(--space-1);
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.cart-line__warning {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.cart-panel__totals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.cart-panel__row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.cart-panel__row dd {
+  margin: 0;
+}
+
+.cart-panel__row--total {
+  padding-top: var(--space-2);
+  border-top: 1px solid;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+}
+
+.cart-panel__note {
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .cart-panel {
+    position: static;
+    width: 100%;
+    max-height: none;
+  }
+}

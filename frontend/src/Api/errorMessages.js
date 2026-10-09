@@ -81,6 +81,10 @@ const DETAIL_PATTERNS = [
   [/^Stock must be an integer$/, () => 'El stock debe ser un número entero'],
   [/^Quantity must be an integer$/, () => 'La cantidad debe ser un número entero'],
   [/^delta must be a non-zero integer$/, () => 'El ajuste debe ser un número entero distinto de cero'],
+  [
+    /^Product \w+ does not exist$/,
+    () => 'Uno de los productos ya no existe en el catálogo; quítalo de la orden',
+  ],
   [/^username is required$/, () => 'El usuario es obligatorio'],
   [/^password is required$/, () => 'La contraseña es obligatoria'],
   [/^customerId is required$/, () => 'Debes seleccionar un cliente'],

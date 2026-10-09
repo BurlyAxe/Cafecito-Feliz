@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import SessionContext from './SessionContext.js'
 import { ROLES } from '../../Api/constants.js'
 import {
+  clearCart,
   clearSelectedCustomer,
   clearSession,
   getSelectedCustomer,
@@ -22,6 +23,7 @@ function SessionProvider({ children }) {
   const signOut = useCallback(() => {
     clearSession()
     clearSelectedCustomer()
+    clearCart()
     setUser(null)
     setCustomer(null)
   }, [])
