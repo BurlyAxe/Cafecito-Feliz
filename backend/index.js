@@ -6,6 +6,7 @@ import { connectDB } from "./Config/database.js";
 import productRoutes from "./Routes/productRoutes.js";
 import customerRoutes from "./Routes/customerRoutes.js";
 import saleRoutes from "./Routes/saleRoutes.js";
+import authRoutes from "./Routes/authRoutes.js";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/products", productRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/sales", saleRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Endpoint not found" });

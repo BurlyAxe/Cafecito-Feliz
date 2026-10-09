@@ -43,7 +43,7 @@ export const getProducts = async (req, res) => {
 
         const [products, total] = await Promise.all([
             Product.find(filter)
-                .sort({ createdAt: -1 })
+                .sort({ createdAt: -1, _id: -1 })
                 .skip((pageNumber - 1) * perPage)
                 .limit(perPage),
             Product.countDocuments(filter),
@@ -87,9 +87,9 @@ export const getProductById = async (req, res) => {
 
 export const createProduct = async (req, res) => {
     try {
-        const { name, price, stock } = req.body ?? {};
+        const { name, description, category, price, stock } = req.body ?? {};
 
-        const product = await Product.create({ name, price, stock });
+        const product = await Product.create({ name, description, category, price, stock });
 
         res.status(201).json({
             message: "Product created",
@@ -111,11 +111,11 @@ export const updateProduct = async (req, res) => {
             return res.status(400).json({ message: "Invalid product ID" });
         }
 
-        const { name, price } = req.body ?? {};
+        const { name, description, category, price } = req.body ?? {};
 
         const product = await Product.findByIdAndUpdate(
             id,
-            { name, price },
+            { name, description, category, price },
             {
                 returnDocument: "after",
                 runValidators: true,
