@@ -1,14 +1,14 @@
-import { PAYMENT_METHODS } from '../../Api/constants.js'
-import { formatCurrency, formatDateTime } from '../../Api/format.js'
+import {
+  formatCurrency,
+  formatDateTime,
+  formatFolio,
+  formatPaymentMethod,
+} from '../../Api/format.js'
 
 const MINUS_SIGN = '−'
 
-function getPaymentLabel(value) {
-  return PAYMENT_METHODS.find((method) => method.value === value)?.label ?? value
-}
-
 function SaleReceipt({ sale, customerName }) {
-  const folio = String(sale._id ?? '').slice(-6).toUpperCase()
+  const folio = formatFolio(sale._id)
 
   return (
     <div className="sale-receipt" data-testid="sale-receipt">
@@ -47,7 +47,7 @@ function SaleReceipt({ sale, customerName }) {
         </div>
         <div className="sale-receipt__row">
           <dt>Método de pago</dt>
-          <dd data-testid="receipt-payment">{getPaymentLabel(sale.paymentMethod)}</dd>
+          <dd data-testid="receipt-payment">{formatPaymentMethod(sale.paymentMethod)}</dd>
         </div>
       </dl>
     </div>

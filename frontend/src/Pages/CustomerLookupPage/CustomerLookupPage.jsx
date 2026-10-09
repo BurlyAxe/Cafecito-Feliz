@@ -7,9 +7,9 @@ import Input from '../../Components/Input/Input.jsx'
 import useSession from '../../Components/SessionProvider/useSession.js'
 import { searchCustomers } from '../../Api/customersApi.js'
 import { formatPhone } from '../../Api/format.js'
+import { isPhoneTerm, normalizeSearchTerm } from '../../Api/normalizeSearchTerm.js'
 import CustomerResultCard from './CustomerResultCard.jsx'
 import NewCustomerForm from './NewCustomerForm.jsx'
-import { isPhoneTerm, normalizeSearchTerm } from './normalizeSearchTerm.js'
 import '../../Styles/pages/customer-lookup-page.css'
 
 function CustomerLookupPage() {

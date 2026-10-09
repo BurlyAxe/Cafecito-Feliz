@@ -3,6 +3,7 @@ import Alert from '../../Components/Alert/Alert.jsx'
 import Button from '../../Components/Button/Button.jsx'
 import Input from '../../Components/Input/Input.jsx'
 import { createCustomer } from '../../Api/customersApi.js'
+import { validateCustomer } from '../../Api/validators.js'
 
 function NewCustomerForm({ initialValues, onCreated, onCancel }) {
   const [values, setValues] = useState(initialValues)
@@ -17,20 +18,14 @@ function NewCustomerForm({ initialValues, onCreated, onCancel }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    const name = values.name.trim()
-    const phone = values.phone.replace(/\D/g, '')
-    const email = values.email.trim().toLowerCase()
-    const nextErrors = {}
-    if (!name) nextErrors.name = 'Escribe el nombre'
-    if (phone.length !== 10) nextErrors.phone = 'El teléfono debe tener 10 dígitos'
-    if (!/^\S+@\S+\.\S+$/.test(email)) nextErrors.email = 'Escribe un correo válido'
+    const { values: customer, errors: nextErrors, isValid } = validateCustomer(values)
     setErrors(nextErrors)
     setApiError(null)
-    if (Object.keys(nextErrors).length > 0) return
+    if (!isValid) return
 
     setLoading(true)
     try {
-      const { data } = await createCustomer({ name, phone, email })
+      const { data } = await createCustomer(customer)
       onCreated(data)
     } catch (error) {
       setApiError(error)

@@ -1,3 +1,5 @@
+import { PAYMENT_METHODS } from './constants.js'
+
 const currencyFormatter = new Intl.NumberFormat('es-MX', {
   style: 'currency',
   currency: 'MXN',
@@ -31,4 +33,13 @@ export function formatDateTime(iso) {
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return ''
   return new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' }).format(date)
+}
+
+// Short sale number shown to people: the last 6 characters of the id
+export function formatFolio(id) {
+  return String(id ?? '').slice(-6).toUpperCase()
+}
+
+export function formatPaymentMethod(value) {
+  return PAYMENT_METHODS.find((method) => method.value === value)?.label ?? value
 }
