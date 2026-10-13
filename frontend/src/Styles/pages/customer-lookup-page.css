@@ -1,0 +1,122 @@
+.lookup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4);
+}
+
+.lookup__ongoing {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.lookup__title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  text-align: center;
+}
+
+.lookup__subtitle {
+  margin: 0;
+  text-align: center;
+}
+
+.lookup__card,
+.new-customer,
+.customer-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid;
+  border-radius: var(--radius-md);
+}
+
+.lookup__form {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.lookup__input {
+  flex: 1;
+}
+
+.lookup__hint {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.lookup__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.lookup__list-title,
+.new-customer__title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.lookup__row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid;
+  border-radius: var(--radius-md);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lookup__row-name {
+  font-weight: 600;
+}
+
+.new-customer__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.customer-card {
+  align-items: flex-start;
+}
+
+.customer-card__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid;
+  border-radius: 50%;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.customer-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.customer-card__name {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.customer-card__line {
+  margin: 0;
+}

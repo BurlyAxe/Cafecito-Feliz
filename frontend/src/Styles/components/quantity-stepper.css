@@ -1,0 +1,28 @@
+.quantity-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.quantity-stepper__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.quantity-stepper__button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.quantity-stepper__value {
+  min-width: 2ch;
+  font-weight: 700;
+  text-align: center;
+}

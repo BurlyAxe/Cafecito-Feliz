@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import Customer from '../Models/Customer.js';
 import Sale from '../Models/Sale.js';
 import SaleItem from '../Models/SaleItem.js';
+import { searchRegex } from '../Utils/searchRegex.js';
 
 const isInvalidId = (id) => !mongoose.Types.ObjectId.isValid(id);
 
@@ -31,8 +32,8 @@ export const getCustomers = async (req, res) => {
 
         const filter = {};
 
-        if (search) {
-            const regex = { $regex: search, $options: "i" };
+        if (typeof search === "string" && search) {
+            const regex = searchRegex(search);
             filter.$or = [{ name: regex }, { email: regex }, { phone: regex }];
         }
 
