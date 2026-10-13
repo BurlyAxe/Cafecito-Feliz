@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
-import { fetchProducts } from '../../Api/productsApi.js'
+import { fetchProducts } from './productsApi.js'
 
-// Loads the catalog. The backend sorts newest first, so the list is reversed
-// to show the products in the order they were created
+// Loads the catalog for the point of sale and the management page.
+// The backend sorts newest first, so the list is reversed to show the creation order
 function useCatalog({ includeOutOfStock = false } = {}) {
   const [state, setState] = useState({ products: [], loading: true, error: null })
   const [version, setVersion] = useState(0)

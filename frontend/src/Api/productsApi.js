@@ -1,8 +1,9 @@
 import { request } from './client.js'
 
-export const fetchProducts = ({ includeOutOfStock = false, search } = {}) =>
+// The backend caps a page at 100 products, more than a café menu needs
+export const fetchProducts = ({ includeOutOfStock = false } = {}) =>
   request('/products', {
-    query: { limit: 100, includeOutOfStock: includeOutOfStock ? 'true' : undefined, search },
+    query: { limit: 100, includeOutOfStock: includeOutOfStock ? 'true' : undefined },
   })
 
 export const createProduct = (product) => request('/products', { method: 'POST', body: product })

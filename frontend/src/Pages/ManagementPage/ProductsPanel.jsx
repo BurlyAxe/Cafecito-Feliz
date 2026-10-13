@@ -8,11 +8,11 @@ import Select from '../../Components/Select/Select.jsx'
 import { CATEGORIES, LOW_STOCK_THRESHOLD } from '../../Api/constants.js'
 import { formatCurrency } from '../../Api/format.js'
 import { deleteProduct } from '../../Api/productsApi.js'
+import useCatalog from '../../Api/useCatalog.js'
 import IconButton from './IconButton.jsx'
 import ProductFormModal from './ProductFormModal.jsx'
 import StockAdjustModal from './StockAdjustModal.jsx'
 import { normalizeText } from './normalizeText.js'
-import useProducts from './useProducts.js'
 
 const ALL_CATEGORIES = ''
 
@@ -28,7 +28,7 @@ function StockBadge({ stock }) {
 
 // `dialog` is { type: 'create' | 'edit' | 'stock' | 'delete', product }
 function ProductsPanel() {
-  const { products, loading, error, reload } = useProducts()
+  const { products, loading, error, reload } = useCatalog({ includeOutOfStock: true })
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState(ALL_CATEGORIES)
   const [dialog, setDialog] = useState(null)
