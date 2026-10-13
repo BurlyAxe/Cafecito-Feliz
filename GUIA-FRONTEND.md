@@ -49,22 +49,28 @@ frontend/
   index.html             entrada de Vite (en CRA: public/index.html)
   vite.config.js         config del dev server
   cypress.config.js      config de Cypress + tarea resetDb
-  cypress/e2e/           6 specs, 52 pruebas
+  cypress/e2e/           7 specs, 61 pruebas
   src/
     main.jsx             createRoot + StrictMode + CSS globales
     App.jsx              las rutas
     Api/                 TODO lo que habla con el backend
     Components/          reutilizables, una carpeta por componente
-      Icons/             Icon.jsx + svg/ con 14 iconos
+      Icons/             Icon.jsx + svg/ con 13 iconos
     Pages/               una carpeta por pantalla, con sus piezas privadas
     Styles/              variables.css, global.css, components/, pages/
 ```
 
 | Carpeta | Qué va | Qué NO va |
 |---|---|---|
-`Api/` | `fetch`, sesión, traducción de errores, formatos de plata y teléfono, validaciones, constantes | JSX |
+`Api/` | `fetch`, sesión, traducción de errores, formatos de plata y teléfono, validaciones, constantes, y `useCatalog`, el hook que carga el catálogo para la caja y Gestión | JSX |
 `Components/` | lo que usa más de una pantalla o no sabe nada del negocio (`Button`, `Modal`, `CartPanel`) | llamadas al backend |
-`Pages/` | la pantalla y lo que solo ella usa (`cartReducer.js`, `CheckoutModal.jsx`, `useCatalog.js`) | piezas que otra pantalla necesite |
+`Pages/` | la pantalla y lo que solo ella usa (`cartReducer.js`, `CheckoutModal.jsx`, `useCartQuote.js`) | piezas que otra pantalla necesite |
+
+**¿Por qué `useCatalog` está en `Api/` si es un hook?** Lo usan dos pantallas (la caja y
+Gestión → Productos), así que no puede vivir dentro de una. Tampoco es un componente: no
+tiene JSX. Lo que hace es pedirle el catálogo al backend y guardar la respuesta, y eso es
+justo lo que va en `Api/`. Antes había dos copias casi idénticas (`useCatalog` en la caja
+y `useProducts` en Gestión); ahora es uno con la opción `includeOutOfStock`.
 `Styles/` | un `.css` por componente o página + variables | colores (todavía; ver sección 10) |
 
 **La regla de oro:** ningún componente llama a `fetch`. Todos pasan por `Api/`, y `Api/`
@@ -89,7 +95,7 @@ useCartQuote                cambia la clave -> quoting: true ("Actualizando…")
     |                       espera 250 ms; si hay otro toque, cancela y vuelve a esperar
 salesApi.quoteCart          { customerId, items: [{ productId, quantity }] }
     |
-client.request              Content-Type + header x-user-role, fetch, traduce errores
+client.request              Content-Type + Authorization: Bearer <token>, fetch, traduce errores
     |
 POST /api/sales/cart        saleRoutes -> SaleController.previewCart
     |
@@ -115,7 +121,9 @@ memoria es para mostrar; nunca se envía.
 `POST /api/auth/login` busca el `User` en Mongo y compara la contraseña con **scrypt**
 (`node:crypto`), con sal aleatoria y `timingSafeEqual`. El seed guarda `salt:hash`, nunca
 la contraseña. El usuario se normaliza (`trim` + minúsculas): `" ADMIN "` también entra.
-Si sale bien, el backend devuelve `{ name, username, role }`. **No devuelve un token.**
+Si sale bien, el backend devuelve `{ name, username, role, token }`. El `token` es un
+**JWT** firmado por el backend con el rol adentro y vence en 8 horas (detalle en la
+sección 5 de la guía del backend).
 
 ### 4.2 Qué se guarda y dónde
 
@@ -123,13 +131,14 @@ Si sale bien, el backend devuelve `{ name, username, role }`. **No devuelve un t
 
 | Clave | Contenido | Se limpia con |
 |---|---|---|
-`cafecito.session` | `{ name, username, role }` | "Salir" |
+`cafecito.session` | `{ name, username, role, token }` | "Salir" o token rechazado |
 `cafecito.customer` | el cliente de la venta en curso | "Salir" o "Atender a otro cliente" |
 `cafecito.cart` | `[{ productId, name, price, quantity }]` | "Salir"; queda vacío al cobrar |
 
-Cada lectura va en `try/catch` y el carrito **se valida al leerlo**: `getCart()` descarta
-todo item sin `productId` string, `price` finito o `quantity` entera positiva. Si alguien
-edita el storage a mano, la app no se rompe.
+Cada lectura va en `try/catch` y los datos **se validan al leerlos**: `getCart()` descarta
+todo item sin `productId` string, `price` finito o `quantity` entera positiva, y
+`getSession()` ignora una sesión sin `token`. Si alguien edita el storage a mano, la app no
+se rompe.
 
 **¿Por qué `sessionStorage` y no `localStorage`?** Vive **por pestaña** y se borra al
 cerrarla: en una caja compartida, cerrar el navegador cierra la sesión (con
@@ -139,10 +148,17 @@ que hacía falta.
 
 ### 4.3 SessionProvider y useSession
 
-Un Context con dos estados, `user` y `customer`, que arrancan leyendo el storage
-(`useState(() => getSession())`). Expone `user`, `customer`, `isAdmin`, `signIn`,
-`signOut`, `selectCustomer` y `clearCustomer`, con el `value` en `useMemo` para no
-re-renderizar a los consumidores de gusto. Context, provider y hook están en **tres
+Un Context con `user` y `customer`, que arrancan leyendo el storage
+(`useState(() => getSession())`), y `sessionExpired`. Expone `user`, `customer`,
+`isAdmin`, `sessionExpired`, `signIn`, `signOut`, `selectCustomer` y `clearCustomer`, con
+el `value` en `useMemo` para no re-renderizar a los consumidores de gusto.
+
+**Sesión vencida.** Si el backend responde 401 a un pedido que llevaba token (venció o lo
+editaron), `client.js` dispara el evento `cafecito:session-expired` en `window`. El
+provider lo escucha con un `useEffect`, llama a `signOut()` y marca `sessionExpired`;
+`ProtectedRoute` manda a `/login`, que muestra "Tu sesión expiró. Vuelve a iniciar
+sesión.". ¿Por qué un evento? Porque `client.js` es JavaScript común y no puede usar
+hooks ni el Context; el evento es el puente. Context, provider y hook están en **tres
 archivos** porque Fast Refresh (la recarga en caliente, igual que en CRA) solo funciona si
 un `.jsx` exporta únicamente componentes; la regla `react/only-export-components` de
 oxlint lo avisa.
@@ -170,11 +186,15 @@ Aviso de poco stock | no | "3 productos con poco stock" |
 Agregar más que el stock | lo deja; la cotización avisa "Solo hay 3 disponibles" | el botón deja de sumar |
 Link **Gestión** | no aparece | sí |
 
-> **Si preguntan por seguridad, sé honesto:** el rol viaja en el header `x-user-role`, que
-> `client.js` lee del `sessionStorage`. Con las DevTools cualquiera cambia `"seller"` por
-> `"admin"` y el backend le cree. Ocultar el link de Gestión es **UX, no seguridad**. El
-> login con scrypt ya está; el paso siguiente es que devuelva un **JWT** firmado y que el
-> backend lea el rol de ahí. Del lado del front es cambiar una línea de `request()`.
+> **Si preguntan por seguridad:** con las DevTools cualquiera puede cambiar `"role":
+> "seller"` por `"admin"` en el `sessionStorage`, y el front le va a mostrar el link de
+> Gestión. Pero el backend no mira ese campo: lee el rol **del token firmado**, así que lo
+> sigue tratando como vendedor (borrar un cliente da 403, los agotados no aparecen, borrar
+> un producto solo lo deja en stock 0). Y si edita el rol dentro del token, la
+> firma deja de coincidir: 401 y vuelve al login. Ocultar el link es **UX, no seguridad**;
+> la seguridad está en el backend. Lo que falta, honestamente: el token no se puede
+> revocar antes de que venza, y en `sessionStorage` lo podría leer un script inyectado
+> (XSS), cosa que React evita escapando todo lo que muestra.
 
 ---
 
@@ -186,10 +206,11 @@ razones: lo que corre en el navegador se puede editar (alguien podría cobrar $0
 sola fuente de verdad para precios y escalones; y el backend calcula en centavos enteros,
 así que repetirlo en JS arriesga diferencias de un centavo entre pantalla y cobro.
 
-**Dos excepciones, por si te las marcan:** antes de la primera cotización cada línea
-muestra `precio × cantidad` como provisorio (`getLineTotal` en `CartPanel`), y
-`DISCOUNT_TIERS` de `constants.js` existe solo para el texto "Descuento de cliente
-frecuente: 10%" de la tarjeta del cliente. Ninguno de los dos se envía ni se cobra.
+**Una excepción, por si te la marcan:** antes de la primera cotización cada línea muestra
+`precio × cantidad` como provisorio (`getLineTotal` en `CartPanel`). No se envía ni se
+cobra. El "Descuento de cliente frecuente: 10%" de la tarjeta del cliente tampoco se
+calcula acá: viene del backend como `discountPercent` dentro del cliente, así que los
+escalones existen en un solo lugar.
 
 ### Falta de stock: 200 al cotizar, 409 al cobrar
 
@@ -257,12 +278,14 @@ useEffect(() => {
 
 ### 7.1 Un solo `request()`
 
-`src/Api/client.js` (68 líneas) es el único lugar con `fetch`. Pone `Content-Type` solo si
-hay body, agrega `x-user-role` leyendo la sesión, y convierte todo error en un `ApiError`
-con `status`, `message` y `details` **ya traducidos**:
+`src/Api/client.js` (70 líneas) es el único lugar con `fetch`. Pone `Content-Type` solo si
+hay body, agrega `Authorization: Bearer <token>` leyendo la sesión, y convierte todo error
+en un `ApiError` con `status`, `message` y `details` **ya traducidos**:
 
 ```js
 if (!response.ok) {
+  // The backend rejected the token (expired or tampered with): the session is over
+  if (response.status === 401 && token) notifySessionExpired()
   throw new ApiError(
     response.status,
     translateMessage(payload?.message) ?? 'Ocurrió un error inesperado.',
@@ -328,7 +351,8 @@ ir al backend. **Un** resultado → tarjeta con compras, descuento y producto fa
 **varios** → lista para elegir; **ninguno** → alta precargada con lo que buscaste. Si hay
 una venta en curso, ofrece "Continuar venta".
 
-**PointOfSalePage (`/venta`).** Catálogo (`useCatalog`) con pestañas por categoría,
+**PointOfSalePage (`/venta`).** Catálogo (`useCatalog({ includeOutOfStock: isAdmin })`,
+de `Api/`) con pestañas por categoría,
 carrito con `useReducer(cartReducer, undefined, getCart)` (arranca desde el storage) y
 `CartPanel`. El reducer tiene cinco acciones (`ADD`, `INCREMENT`, `DECREMENT`, `REMOVE`,
 `CLEAR`) en un archivo de 41 líneas: toda la lógica del carrito en una función pura.
@@ -338,14 +362,17 @@ carrito con `useReducer(cartReducer, undefined, getCart)` (arranca desde el stor
 **ManagementPage (`/gestion`, solo admin).** La pestaña vive en la URL (`?tab=clientes`,
 con `useSearchParams`), así un F5 no te devuelve a Productos.
 
-- **Productos:** filtra en el navegador por nombre **sin acentos** (`normalizeText`: "te"
-  encuentra "Té verde") y por categoría. Crear, editar, ajustar stock, eliminar. El stock
-  solo se escribe al crear; después se mueve con `PATCH /stock` y un `delta` (+7, −5),
-  nunca pisándolo con un `PUT`, porque se perdería una venta hecha en otra caja.
-- **Clientes:** búsqueda y paginación **en el servidor** (10 por página), historial con
-  los snapshots (si el Latte sube a $99, el ticket viejo sigue en $58), editar y
-  eliminar. Eliminar uno con ventas → 409 → "No se puede eliminar un cliente que tiene
-  ventas registradas", dentro del mismo diálogo.
+- **Productos:** el mismo `useCatalog`, con `includeOutOfStock: true`. Filtra en el
+  navegador por nombre **sin acentos** (`normalizeText`: "te" encuentra "Té verde") y por
+  categoría. Crear, editar, ajustar stock, eliminar. Un nombre repetido ("LATTE") → 409 →
+  "Ya existe un producto con ese nombre". El stock solo se escribe al crear; después se
+  mueve con `PATCH /stock` y un `delta` (+7, −5), nunca pisándolo con un `PUT`, porque se
+  perdería una venta hecha en otra caja.
+- **Clientes:** búsqueda y paginación **en el servidor** (10 por página; el backend ignora
+  acentos: "maria lopez" encuentra a "María López"), historial con los snapshots (si el
+  Latte sube a $99, el ticket viejo sigue en $58), editar y eliminar. Eliminar uno con
+  ventas → 409 → "No se puede eliminar un cliente que tiene ventas registradas", dentro
+  del mismo diálogo.
 
 ### Componentes reutilizables
 
@@ -386,9 +413,12 @@ objeto `{ cup: '<svg…>', plus: '<svg…>', … }` y el componente inyecta el t
 './cup.svg'`, un import por ícono, o `require.context` de webpack para traerlos todos.
 
 **¿`dangerouslySetInnerHTML` no es peligroso?** Con contenido del usuario o del backend, sí.
-Acá sale de 14 archivos nuestros leídos al compilar; nada externo pasa por ahí.
+Acá sale de 13 archivos nuestros leídos al compilar; nada externo pasa por ahí.
 
-**Por qué importa `currentColor`:** los 14 SVG dibujan con `stroke="currentColor"`, o sea,
+**Ojo con el glob:** como importa **todos** los `.svg` de la carpeta, un ícono que nadie usa
+igual viaja en el bundle. Por eso se borró `user.svg`, que no usaba ninguna pantalla.
+
+**Por qué importa `currentColor`:** los 13 SVG dibujan con `stroke="currentColor"`, o sea,
 toman el color del texto que los rodea. Dentro de un botón rojo el ícono va a ser rojo sin
 tocar un SVG. Hoy no tienen color; cuando llegue la paleta lo van a tener solos.
 
@@ -438,12 +468,13 @@ completa funciona**.
 | Spec | Pruebas | Qué cubre |
 |---|---|---|
 `smoke.cy.js` | 5 | redirige sin sesión, vendedor fuera de Gestión, 404, `/api/health` |
-`login.cy.js` | 10 | los dos roles, contraseña mala, vacíos sin request, salir, backend caído |
+`login.cy.js` | 10 | los dos roles (y que se guarda el token), contraseña mala, vacíos sin request, salir, backend caído |
+`auth.cy.js` | 6 | 401 sin token o con el viejo `x-user-role`, token con el rol editado, token vencido, 403 por rol, sesión vencida → login, sesión sin token |
 `customer-lookup.cy.js` | 11 | teléfono con espacios, correo en mayúsculas, varios resultados, alta, correo duplicado |
 `point-of-sale.cy.js` | 14 | qué ve cada rol, descuento, stepper, ticket, falta de stock, producto borrado, F5 |
-`management.cy.js` | 11 | filtros sin acentos, CRUD, ajuste de stock, paginación, historial, snapshots |
+`management.cy.js` | 14 | filtros sin acentos, CRUD, nombre repetido, ajuste de stock, búsqueda de clientes sin acentos, teléfono rechazado por el backend, paginación, historial, snapshots |
 `full-flow.cy.js` | 1 | la historia entera solo por la UI: vende el vendedor, revisa el admin |
-**Total** | **52** | |
+**Total** | **61** | |
 
 Se corren con `npm run test:e2e` (sin ventana) o `npm run cy:open` (con interfaz), con
 backend y frontend levantados.
@@ -453,7 +484,11 @@ antes de cada spec o prueba (base limpia y conocida; **borra los datos**).
 **`cy.visitAs(path, { role, customerEmail })`** se loguea por la API real, busca al
 cliente y escribe sesión y cliente en `sessionStorage` en `onBeforeLoad`, antes de que
 cargue la app: cada prueba arranca donde le interesa sin repetir el login por la UI, que
-ya se prueba en `login.cy.js` y `full-flow`.
+ya se prueba en `login.cy.js` y `full-flow`. **`cy.apiRequest(options, role)`** es un
+`cy.request` con el token de un login real (`auth: { bearer }`), para preparar datos por la
+API (quitar stock, registrar una venta). Y la tarea **`createExpiredToken`** firma un token
+ya vencido con la librería y el `JWT_SECRET` del backend, para probar el vencimiento sin
+esperar 8 horas.
 
 **¿Por qué `cy.task` y no `cy.exec`?** `cy.exec` corre el comando con la shell del
 usuario; acá es Git Bash, instalado en `C:\Program Files\Git`, y el espacio de "Program
@@ -466,6 +501,7 @@ on('task', {
     execSync('npm run seed', { cwd: backendDir, stdio: 'ignore' })
     return null
   },
+  createExpiredToken(role) { … },   // jwt.sign con exp en el pasado
 })
 ```
 
@@ -529,7 +565,13 @@ Abrí `http://127.0.0.1:5173`. Usuarios: **vendedor / cafecito123** y **admin / 
 10. **Gestión → Productos**: el Latte quedó en 28. **Clientes**: María con 13 compras;
     "Ver compras" muestra el ticket de recién.
 11. Eliminá a María → **"No se puede eliminar un cliente que tiene ventas registradas"**.
-12. (Opcional) Apagá el backend e intentá entrar → **"No se pudo conectar con el
+12. En **Clientes** buscá `maria lopez` (sin acentos) → aparece María López. En
+    **Productos**, creá uno llamado `LATTE` → **"Ya existe un producto con ese nombre"**.
+13. DevTools → Application → Session Storage → `cafecito.session`: mostrá el `token` y
+    pegalo en jwt.io (se lee el rol, pero no se puede cambiar sin el secreto). Borrale un
+    carácter al final del token y buscá un cliente → vuelve al login con **"Tu sesión
+    expiró. Vuelve a iniciar sesión."**
+14. (Opcional) Apagá el backend e intentá entrar → **"No se pudo conectar con el
     servidor"**.
 
 ---
@@ -554,8 +596,15 @@ Gana uno: el backend descuenta con un update condicional atómico. El otro recib
 "Cobrar" deshabilitado hasta que ajuste el carrito.
 
 **¿Cómo sabe la app qué rol tengo?**
-El login devuelve `{ name, username, role }`, se guarda en `sessionStorage` y lo expone el
-`SessionProvider`. `request()` lo manda en `x-user-role`. Es la parte débil: falta JWT.
+El login devuelve `{ name, username, role, token }`, se guarda en `sessionStorage` y lo
+expone el `SessionProvider`. El front usa `role` solo para decidir qué mostrar;
+`request()` manda el `token` en `Authorization: Bearer`, y el backend saca el rol de ahí,
+verificando la firma. Editar el `role` del storage cambia la pantalla, no los permisos.
+
+**¿Qué pasa cuando vence la sesión?**
+El backend responde 401, `client.js` avisa con un evento, el `SessionProvider` cierra la
+sesión y la app vuelve al login con "Tu sesión expiró". Lo prueba `auth.cy.js` con un
+token vencido de verdad.
 
 **¿Por qué Context y no Redux?**
 Hay dos datos globales: el usuario y el cliente elegido. Redux sería una dependencia y
@@ -568,11 +617,15 @@ respuesta vieja no pise el total nuevo.
 
 **¿El vendedor no entra a Gestión solo porque ocultaste el link?**
 No: la ruta tiene `ProtectedRoute roles={[ROLES.ADMIN]}` y el backend responde 403 a lo que
-el rol no permite. Ocultar el link es UX; la protección real está en el backend.
+el rol del token no permite. Ocultar el link es UX; la protección real está en el backend.
+
+**¿Por qué `useCatalog` está en `Api/`?**
+Porque lo usan dos pantallas y su trabajo es traer datos del backend. Antes eran dos hooks
+casi iguales, uno por pantalla; tener uno solo evita que se desincronicen.
 
 **¿Cómo lo probaste? ¿Qué le falta?**
-52 pruebas E2E con Cypress contra el sistema completo, una de ellas solo por la UI. Falta
-JWT, colores, pruebas unitarias (Vitest, el equivalente de Jest) y lo de la sección 14.
+61 pruebas E2E con Cypress contra el sistema completo, una de ellas solo por la UI. Faltan
+colores, pruebas unitarias (Vitest, el equivalente de Jest) y lo de la sección 14.
 
 ---
 
@@ -580,15 +633,17 @@ JWT, colores, pruebas unitarias (Vitest, el equivalente de Jest) y lo de la secc
 
 | Limitación | Por qué pasa | Cómo se arregla |
 |---|---|---|
-Sin JWT | el login valida pero no emite token | devolver un JWT y mandarlo en `Authorization` |
-Rol falsificable | el backend confía en `x-user-role` | que el middleware lea el rol del JWT |
-Búsqueda de clientes sensible a acentos | `$regex` con `i` en Mongo: "maria" no encuentra "María" (productos sí, porque filtran en el front) | campo normalizado o collation |
-Nombres de producto repetibles | `Product` no tiene índice único en `name` | índice único (el front ya traduce el 409) |
-Teléfono sin validar en el backend | `Customer` solo exige que exista; los 10 dígitos los valida el front | `match` en el schema |
+El token no se puede revocar | un JWT vale hasta que vence (8 h); "Salir" solo lo borra del navegador | lista de tokens revocados en el backend, o tokens cortos + renovación |
+Token en `sessionStorage` | un script inyectado (XSS) podría leerlo | cookie `httpOnly`; hoy React escapa todo lo que muestra |
 Sin colores | paleta pendiente | `variables.css` + las clases que ya existen |
-Catálogo hasta 100 productos | `fetchProducts` pide `limit: 100`, el backend topea en 100 | paginar o buscar en el servidor |
-Escalones de descuento duplicados | `DISCOUNT_TIERS` del front es solo para mostrar | que el backend devuelva el escalón |
+Catálogo hasta 100 productos | `fetchProducts` pide `limit: 100`, el backend topea en 100; la cafetería tiene 16 | paginar o buscar en el servidor (el endpoint ya acepta `search` y `page`) |
 Sin pruebas unitarias | todo está cubierto con E2E | Vitest para `cartReducer`, `normalizeSearchTerm`, `errorMessages` |
+
+**Ya resueltas, por si te preguntan:** el rol viajaba en un header falsificable y ahora
+viaja en un JWT firmado; la búsqueda de clientes ignora
+acentos; los nombres de producto son únicos sin importar mayúsculas (409 traducido); el
+backend valida los 10 dígitos del teléfono; y los escalones de descuento ya no están
+duplicados en el front.
 
 ---
 
@@ -601,8 +656,8 @@ administrador además ve el stock y administra productos y clientes.
 Lo interesante son tres cosas: el front **nunca calcula plata**, cada cambio del carrito
 pide una cotización al backend con debounce y cancelación del pedido anterior, y mientras
 espera mantiene el último total bueno; todo el contacto con el backend pasa por una sola
-función que agrega el rol, detecta el backend caído y traduce los errores a español; y
-sesión, cliente y carrito viven en `sessionStorage`, así sobreviven a un F5 pero no al
-cierre de la pestaña. Lo cubren 52 pruebas end-to-end en Cypress contra el sistema
-completo. La limitación conocida es que el rol viaja en un header: el paso siguiente es
-JWT.
+función que agrega el token firmado, detecta el backend caído y la sesión vencida, y
+traduce los errores a español; y sesión, cliente y carrito viven en `sessionStorage`, así
+sobreviven a un F5 pero no al cierre de la pestaña. Lo cubren 61 pruebas end-to-end en
+Cypress contra el sistema completo. Lo que falta, y lo sé: colores, pruebas unitarias y
+poder revocar un token antes de que venza.

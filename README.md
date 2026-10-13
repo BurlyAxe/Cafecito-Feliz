@@ -6,8 +6,10 @@ Todo se guarda en MongoDB a través del backend; el frontend no tiene datos de p
 
 ## Estructura
 
-- `backend/` — API REST con Express 5 y Mongoose 9 (módulos ES).
+- `backend/` — API REST con Express 5 y Mongoose 9 (módulos ES). Login con contraseñas hasheadas (scrypt) y token JWT.
 - `frontend/` — React 19 con Vite y React Router. Pruebas end-to-end con Cypress.
+
+Guías de estudio: [GUIA-BACKEND.md](GUIA-BACKEND.md) y [GUIA-FRONTEND.md](GUIA-FRONTEND.md).
 
 ## Requisitos
 
@@ -29,6 +31,13 @@ Crea el archivo `backend/.env` a partir de `backend/.env.example`:
 PORT=3000
 NODE_ENV=development
 DB_CONNECTION_STRING=mongodb://127.0.0.1:27017/cafecito-feliz-db
+JWT_SECRET=una-cadena-larga-y-aleatoria
+```
+
+`JWT_SECRET` firma los tokens de sesión; sin él la API no arranca. Genera uno con:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
 Carga los datos de ejemplo (usuarios, productos y clientes):
