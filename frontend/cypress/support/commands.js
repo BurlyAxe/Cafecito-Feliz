@@ -17,6 +17,18 @@ Cypress.Commands.add('apiLogin', (role = 'seller') => {
     .then((response) => response.body.data)
 })
 
+// cy.request with the token of a real login, like the app sends it.
+// The path is relative to the API: cy.apiRequest({ url: '/customers' }, 'seller')
+Cypress.Commands.add('apiRequest', (options, role = 'admin') => {
+  return cy.apiLogin(role).then((user) =>
+    cy.request({
+      ...options,
+      url: `${Cypress.env('apiUrl')}${options.url}`,
+      auth: { bearer: user.token },
+    }),
+  )
+})
+
 Cypress.Commands.add('visitAs', (path, { role = 'seller', customerEmail } = {}) => {
   cy.apiLogin(role).then((user) => {
     const findCustomer = customerEmail
@@ -24,7 +36,7 @@ Cypress.Commands.add('visitAs', (path, { role = 'seller', customerEmail } = {}) 
           .request({
             url: `${Cypress.env('apiUrl')}/customers`,
             qs: { search: customerEmail },
-            headers: { 'x-user-role': user.role },
+            auth: { bearer: user.token },
           })
           .then((response) => response.body.data[0])
       : cy.wrap(null)

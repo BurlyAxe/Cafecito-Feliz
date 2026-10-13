@@ -2,10 +2,9 @@ import mongoose from 'mongoose';
 import Customer from '../Models/Customer.js';
 import Sale from '../Models/Sale.js';
 import SaleItem from '../Models/SaleItem.js';
+import { searchRegex } from '../Utils/searchRegex.js';
 
 const isInvalidId = (id) => !mongoose.Types.ObjectId.isValid(id);
-
-const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const handledClientError = (res, error) => {
     if (error.name === "ValidationError") {
@@ -34,7 +33,7 @@ export const getCustomers = async (req, res) => {
         const filter = {};
 
         if (typeof search === "string" && search) {
-            const regex = { $regex: escapeRegex(search), $options: "i" };
+            const regex = searchRegex(search);
             filter.$or = [{ name: regex }, { email: regex }, { phone: regex }];
         }
 

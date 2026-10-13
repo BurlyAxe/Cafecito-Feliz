@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Customer from "../Models/Customer.js";
+import Customer, { getDiscountPercent } from "../Models/Customer.js";
 import Product from "../Models/Product.js";
 import Sale from "../Models/Sale.js";
 import SaleItem from "../Models/SaleItem.js";
@@ -7,12 +7,6 @@ import SaleItem from "../Models/SaleItem.js";
 const isInvalidId = (id) => !mongoose.Types.ObjectId.isValid(id);
 
 const PAYMENT_METHODS = Sale.schema.path("paymentMethod").enumValues;
-
-const DISCOUNT_TIERS = [
-    { minPurchases: 20, percent: 15 },
-    { minPurchases: 10, percent: 10 },
-    { minPurchases: 5, percent: 5 },
-];
 
 export class SaleError extends Error {
     constructor(status, message, errors = []) {
@@ -26,9 +20,6 @@ export class SaleError extends Error {
 const toCents = (amount) => Math.round(amount * 100);
 
 const fromCents = (cents) => cents / 100;
-
-const getDiscountPercent = (purchasesCount) =>
-    DISCOUNT_TIERS.find((tier) => purchasesCount >= tier.minPurchases)?.percent ?? 0;
 
 const buildTotals = (subtotalCents, discountPercent) => {
     const discountCents = Math.round((subtotalCents * discountPercent) / 100);

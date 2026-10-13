@@ -1,7 +1,6 @@
 import { translateDetails } from '../../src/Api/errorMessages.js'
 
 const MARIA = 'maria.lopez@correo.com'
-const ADMIN_HEADERS = { 'x-user-role': 'admin' }
 
 const productRows = () => cy.get('[data-testid=product-row]')
 const productRow = (name) =>
@@ -18,27 +17,18 @@ const openCustomersTab = () => cy.contains('[role=tab]', 'Clientes').click()
 
 function findProductId(name) {
   return cy
-    .request({
-      url: `${Cypress.env('apiUrl')}/products`,
-      qs: { limit: 100, includeOutOfStock: true },
-      headers: ADMIN_HEADERS,
-    })
+    .apiRequest({ url: '/products', qs: { limit: 100, includeOutOfStock: true } })
     .then((response) => response.body.data.find((product) => product.name === name)._id)
 }
 
 // María has 12 purchases, so the backend applies 10%: 2 × $58 = $116 − $11.60 = $104.40
 function createLatteSaleForMaria() {
-  cy.request({
-    url: `${Cypress.env('apiUrl')}/customers`,
-    qs: { search: MARIA },
-    headers: ADMIN_HEADERS,
-  }).then(({ body }) => {
+  cy.apiRequest({ url: '/customers', qs: { search: MARIA } }).then(({ body }) => {
     const customerId = body.data[0]._id
     findProductId('Latte').then((productId) => {
-      cy.request({
+      cy.apiRequest({
         method: 'POST',
-        url: `${Cypress.env('apiUrl')}/sales`,
-        headers: ADMIN_HEADERS,
+        url: '/sales',
         body: { customerId, paymentMethod: 'cash', items: [{ productId, quantity: 2 }] },
       })
         .its('body.data.total')
@@ -133,6 +123,19 @@ describe('management', () => {
     cy.contains('[data-testid=product-card]', 'Galleta de avena').should('contain', '$25.00')
   })
 
+  it('rejects a product name that already exists, ignoring case', () => {
+    cy.contains('button', 'Nuevo producto').click()
+    dialog().within(() => {
+      cy.get('input[name=name]').type('LATTE')
+      cy.get('select[name=category]').select('Café')
+      cy.get('input[name=price]').type('50')
+      cy.contains('button', 'Crear producto').click()
+      cy.get('[role=alert]').should('contain', 'Ya existe un producto con ese nombre')
+      cy.contains('button', 'Cancelar').click()
+    })
+    productRows().should('have.length', 16)
+  })
+
   it('validates the price in the form and the backend rejects a negative one', () => {
     cy.intercept('POST', '**/products').as('createProduct')
     cy.contains('button', 'Nuevo producto').click()
@@ -148,10 +151,9 @@ describe('management', () => {
     cy.get('@createProduct.all').should('have.length', 0)
 
     findProductId('Latte').then((id) => {
-      cy.request({
+      cy.apiRequest({
         method: 'PUT',
-        url: `${Cypress.env('apiUrl')}/products/${id}`,
-        headers: ADMIN_HEADERS,
+        url: `/products/${id}`,
         body: { name: 'Latte', description: '12 oz', category: 'coffee', price: -1 },
         failOnStatusCode: false,
       }).then((response) => {
@@ -226,6 +228,33 @@ describe('management', () => {
     cy.contains('[role=tab]', 'Productos').click()
     cy.location('search').should('eq', '')
     productRows().should('have.length', 16)
+  })
+
+  it('searches customers by name ignoring accents', () => {
+    openCustomersTab()
+    cy.get('input[name=customerSearch]').type('maria lopez')
+    cy.contains('button', 'Buscar').click()
+    customerRows().should('have.length', 1).and('contain', 'María López')
+    cy.get('input[name=customerSearch]').clear().type('RUÍZ')
+    cy.contains('button', 'Buscar').click()
+    customerRows().should('have.length', 1).and('contain', 'Carlos Ruiz')
+  })
+
+  it('has the backend reject a phone without 10 digits', () => {
+    cy.apiRequest({ url: '/customers', qs: { search: MARIA } }).then(({ body }) => {
+      const { _id: id, name, email } = body.data[0]
+      cy.apiRequest({
+        method: 'PUT',
+        url: `/customers/${id}`,
+        body: { name, email, phone: '449 123' },
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(400)
+        expect(translateDetails(response.body.errors)).to.deep.eq([
+          'El teléfono debe tener 10 dígitos',
+        ])
+      })
+    })
   })
 
   it('edits a customer and rejects a duplicated email', () => {

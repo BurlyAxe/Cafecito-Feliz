@@ -8,6 +8,11 @@ import customerRoutes from "./Routes/customerRoutes.js";
 import saleRoutes from "./Routes/saleRoutes.js";
 import authRoutes from "./Routes/authRoutes.js";
 
+if (!process.env.JWT_SECRET) {
+  console.error("❌ Missing JWT_SECRET in the .env file");
+  process.exit(1);
+}
+
 const app = express();
 
 app.use(cors());

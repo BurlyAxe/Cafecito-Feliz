@@ -15,6 +15,8 @@ const FIELD_NAMES = {
 const MESSAGES = {
   'Invalid credentials': 'Usuario o contraseña incorrectos',
   Forbidden: 'No tienes permiso para realizar esta acción',
+  'Authentication required': 'Inicia sesión para continuar',
+  'Invalid or expired token': 'Tu sesión expiró. Vuelve a iniciar sesión.',
   'Invalid data': 'Revisa los datos ingresados',
   'Customer not found': 'No se encontró al cliente',
   'Product not found': 'No se encontró el producto',
@@ -63,6 +65,7 @@ const DETAIL_PATTERNS = [
   ],
   [/^Path `(\w+)` is required\.?$/, (_, field) => `El campo ${fieldName(field)} es obligatorio`],
   [/^Email format is not valid$/, () => 'El correo no tiene un formato válido'],
+  [/^Phone must have exactly 10 digits$/, () => 'El teléfono debe tener 10 dígitos'],
   [
     /^`(.+)` is not a valid enum value for path `(\w+)`\.?$/,
     (_, value, field) => `El valor "${value}" no es válido para ${fieldName(field)}`,

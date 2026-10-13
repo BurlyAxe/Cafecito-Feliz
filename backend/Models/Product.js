@@ -43,6 +43,10 @@ const productSchema = new mongoose.Schema(
     }
 );
 
+// Two products cannot share a name, ignoring case: "latte" is the same as "Latte".
+// Strength 2 compares letters and accents but not case, so "Te" and "Té" stay different
+productSchema.index({ name: 1 }, { unique: true, collation: { locale: "es", strength: 2 } });
+
 const Product = mongoose.model("Product", productSchema);
 
 export default Product;

@@ -18,11 +18,3 @@ export const PAYMENT_METHODS = [
 ]
 
 export const LOW_STOCK_THRESHOLD = 5
-
-// Display-only: the backend is the source of truth for the discount.
-// Each tier means "from minPurchases purchases, percent off".
-export const DISCOUNT_TIERS = [
-  { minPurchases: 20, percent: 15 },
-  { minPurchases: 10, percent: 10 },
-  { minPurchases: 5, percent: 5 },
-]

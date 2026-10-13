@@ -28,9 +28,17 @@ function remove(key) {
   }
 }
 
-export const getSession = () => read(SESSION_KEY)
+// A session without its signed token (from an older version, or edited by hand) is not valid
+export function getSession() {
+  const session = read(SESSION_KEY)
+  return typeof session?.token === 'string' && typeof session.role === 'string' ? session : null
+}
 export const saveSession = (user) => write(SESSION_KEY, user)
 export const clearSession = () => remove(SESSION_KEY)
+
+// client.js fires this event when the backend rejects the token; SessionProvider signs out
+export const SESSION_EXPIRED_EVENT = 'cafecito:session-expired'
+export const notifySessionExpired = () => window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT))
 
 export const getSelectedCustomer = () => read(CUSTOMER_KEY)
 export const saveSelectedCustomer = (customer) => write(CUSTOMER_KEY, customer)

@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
 import Product from "../Models/Product.js";
 import { ROLES, getRole } from "../Middlewares/requireRole.js";
+import { searchRegex } from "../Utils/searchRegex.js";
 
 const isInvalidId = (id) => !mongoose.Types.ObjectId.isValid(id);
-
-const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const isStaff = (req) => [ROLES.SELLER, ROLES.ADMIN].includes(getRole(req));
 
@@ -36,7 +35,7 @@ export const getProducts = async (req, res) => {
         const filter = {};
 
         if (typeof search === "string" && search) {
-            filter.name = { $regex: escapeRegex(search), $options: "i" };
+            filter.name = searchRegex(search);
         }
 
         if (!showAll) {

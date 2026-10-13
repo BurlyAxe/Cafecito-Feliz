@@ -1,4 +1,4 @@
-import { getSession } from './session.js'
+import { getSession, notifySessionExpired } from './session.js'
 import { translateDetails, translateMessage } from './errorMessages.js'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api'
@@ -32,8 +32,8 @@ async function parseJson(response) {
 export async function request(path, { method = 'GET', body, query, signal } = {}) {
   const headers = {}
   if (body !== undefined) headers['Content-Type'] = 'application/json'
-  const role = getSession()?.role
-  if (role) headers['x-user-role'] = role
+  const token = getSession()?.token
+  if (token) headers.Authorization = `Bearer ${token}`
 
   let response
   try {
@@ -57,6 +57,8 @@ export async function request(path, { method = 'GET', body, query, signal } = {}
   const payload = await parseJson(response)
 
   if (!response.ok) {
+    // The backend rejected the token (expired or tampered with): the session is over
+    if (response.status === 401 && token) notifySessionExpired()
     throw new ApiError(
       response.status,
       translateMessage(payload?.message) ?? 'Ocurrió un error inesperado.',

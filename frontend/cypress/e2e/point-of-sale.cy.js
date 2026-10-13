@@ -14,9 +14,7 @@ const checkoutButton = () => cartPanel().contains('button', 'Cobrar')
 
 function findProductId(name) {
   return cy
-    .request(`${Cypress.env('apiUrl')}/products?limit=100&includeOutOfStock=true`, {
-      headers: { 'x-user-role': 'admin' },
-    })
+    .apiRequest({ url: '/products', qs: { limit: 100, includeOutOfStock: true } })
     .then((response) => response.body.data.find((product) => product.name === name)._id)
 }
 
@@ -159,10 +157,9 @@ describe('point of sale', () => {
     addProduct('Chai latte')
     checkoutButton().should('contain', 'Cobrar $162.00').and('not.be.disabled')
     findProductId('Chai latte').then((id) => {
-      cy.request({
+      cy.apiRequest({
         method: 'PATCH',
-        url: `${Cypress.env('apiUrl')}/products/${id}/stock`,
-        headers: { 'x-user-role': 'admin' },
+        url: `/products/${id}/stock`,
         body: { delta: -3 },
       })
     })
@@ -195,11 +192,7 @@ describe('point of sale', () => {
     addProduct('Espresso')
     checkoutButton().should('contain', 'Cobrar $34.20')
     findProductId('Espresso').then((id) => {
-      cy.request({
-        method: 'DELETE',
-        url: `${Cypress.env('apiUrl')}/products/${id}`,
-        headers: { 'x-user-role': 'admin' },
-      })
+      cy.apiRequest({ method: 'DELETE', url: `/products/${id}` })
     })
     addProduct('Latte')
     cartPanel().within(() => {

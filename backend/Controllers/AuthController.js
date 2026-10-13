@@ -1,5 +1,5 @@
 import User from "../Models/User.js";
-import { verifyPassword } from "../Services/authService.js";
+import { createToken, verifyPassword } from "../Services/authService.js";
 
 const isFilled = (value) => typeof value === "string" && value.trim() !== "";
 
@@ -32,6 +32,7 @@ export const login = async (req, res) => {
                 name: user.name,
                 username: user.username,
                 role: user.role,
+                token: createToken(user),
             },
         });
     } catch (error) {

@@ -9,7 +9,7 @@ import { login } from '../../Api/authApi.js'
 import '../../Styles/pages/login-page.css'
 
 function LoginPage() {
-  const { user, signIn } = useSession()
+  const { user, sessionExpired, signIn } = useSession()
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -51,6 +51,9 @@ function LoginPage() {
         </div>
 
         <form className="login-card__form" onSubmit={handleSubmit} noValidate>
+          {sessionExpired && !apiError && (
+            <Alert tone="info">Tu sesión expiró. Vuelve a iniciar sesión.</Alert>
+          )}
           {apiError && (
             <Alert tone="error" messages={apiError.details ?? []}>
               {apiError.message}

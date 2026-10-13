@@ -50,7 +50,7 @@ const seed = async () => {
       User.deleteMany({}),
     ]);
 
-    await Promise.all([User.init(), Customer.init()]);
+    await Promise.all([User.init(), Customer.init(), Product.init()]);
 
     const usersWithHash = await Promise.all(
       users.map(async ({ password, ...user }) => ({

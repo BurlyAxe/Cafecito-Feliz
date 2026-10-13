@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react'
 import Button from '../../Components/Button/Button.jsx'
-import { DISCOUNT_TIERS } from '../../Api/constants.js'
 import { fetchCustomerFavorite } from '../../Api/customersApi.js'
 import { formatPhone, getInitials } from '../../Api/format.js'
 
-function getDiscountLine(purchasesCount) {
-  const tier = DISCOUNT_TIERS.find((item) => purchasesCount >= item.minPurchases)
-  if (tier) return `Descuento de cliente frecuente: ${tier.percent}%`
-  const lowest = DISCOUNT_TIERS[DISCOUNT_TIERS.length - 1]
-  return `Aún sin descuento (a partir de ${lowest.minPurchases} compras)`
+// The backend sends discountPercent with the customer: the tiers live only there
+function getDiscountLine(discountPercent) {
+  if (discountPercent > 0) return `Descuento de cliente frecuente: ${discountPercent}%`
+  return 'Aún sin descuento de cliente frecuente'
 }
 
 function CustomerResultCard({ customer, onStartSale }) {
@@ -48,7 +46,7 @@ function CustomerResultCard({ customer, onStartSale }) {
         <p className="customer-card__line">
           {purchases === 1 ? '1 compra' : `${purchases} compras`}
         </p>
-        <p className="customer-card__line">{getDiscountLine(purchases)}</p>
+        <p className="customer-card__line">{getDiscountLine(customer.discountPercent)}</p>
         {favoriteLine && <p className="customer-card__line">{favoriteLine}</p>}
       </div>
       <Button onClick={() => onStartSale(customer)}>Iniciar venta</Button>

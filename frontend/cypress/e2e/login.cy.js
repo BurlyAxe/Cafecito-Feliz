@@ -20,7 +20,9 @@ describe('login', () => {
     cy.location('pathname').should('eq', '/clientes')
     cy.get('[data-testid=role-badge]').should('contain', 'Vendedor')
     cy.window().then((win) => {
-      expect(JSON.parse(win.sessionStorage.getItem(SESSION_KEY)).role).to.eq('seller')
+      const session = JSON.parse(win.sessionStorage.getItem(SESSION_KEY))
+      expect(session.role).to.eq('seller')
+      expect(session.token).to.be.a('string').and.match(/^[\w-]+\.[\w-]+\.[\w-]+$/)
     })
   })
 
