@@ -59,6 +59,7 @@
 
 .checkout__total strong {
   font-size: var(--font-size-xl);
+  color: var(--color-primary);
 }
 
 .checkout__methods {
@@ -91,17 +92,24 @@
   font-weight: 600;
   text-align: center;
   cursor: pointer;
+  border-color: var(--color-border);
+  color: var(--color-secondary);
+  background-color: var(--color-surface);
 }
 
 .checkout__option--selected {
   border-width: 3px;
   padding: calc(var(--space-3) - 2px);
   font-weight: 700;
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+  background-color: var(--color-primary);
 }
 
 .checkout__option:focus-within {
   outline: 2px solid;
   outline-offset: 2px;
+  outline-color: var(--color-primary);
 }
 
 .checkout__methods:disabled .checkout__option {
@@ -124,6 +132,7 @@
 .sale-receipt__number {
   font-size: var(--font-size-lg);
   font-weight: 700;
+  color: var(--color-primary);
 }
 
 .sale-receipt__meta {
@@ -139,6 +148,7 @@
   padding: 0 0 var(--space-3);
   border-bottom: 1px solid;
   list-style: none;
+  border-color: var(--color-border);
 }
 
 .sale-receipt__line,
@@ -162,6 +172,7 @@
 .sale-receipt__row--total {
   font-size: var(--font-size-lg);
   font-weight: 700;
+  color: var(--color-primary);
 }
 
 @media (max-width: 900px) {

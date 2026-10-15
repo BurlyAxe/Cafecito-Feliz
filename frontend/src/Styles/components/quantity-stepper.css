@@ -14,6 +14,9 @@
   border: 1px solid;
   border-radius: 50%;
   cursor: pointer;
+  border-color: var(--color-border-strong);
+  color: var(--color-secondary);
+  background-color: var(--color-surface);
 }
 
 .quantity-stepper__button:disabled {

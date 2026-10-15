@@ -9,6 +9,8 @@ body {
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   font-size: var(--font-size-md);
   line-height: 1.4;
+  color: var(--color-text);
+  background-color: var(--color-background);
 }
 
 h1,
@@ -22,6 +24,15 @@ button,
 input,
 select {
   font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--color-primary);
+}
+
+:focus-visible {
+  outline-color: var(--color-primary);
 }
 
 .icon {

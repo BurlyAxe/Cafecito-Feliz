@@ -18,6 +18,7 @@
 
 .management__title {
   font-size: var(--font-size-xl);
+  color: var(--color-primary);
 }
 
 .management__subtitle {
@@ -76,6 +77,8 @@
   overflow-x: auto;
   border: 1px solid;
   border-radius: var(--radius-md);
+  border-color: var(--color-border);
+  background-color: var(--color-surface);
 }
 
 .data-table {
@@ -89,6 +92,7 @@
   border-bottom: 1px solid;
   text-align: left;
   vertical-align: middle;
+  border-color: var(--color-border);
 }
 
 .data-table tbody tr:last-child td {
@@ -99,6 +103,8 @@
   font-size: var(--font-size-sm);
   font-weight: 600;
   white-space: nowrap;
+  color: var(--color-on-secondary);
+  background-color: var(--color-secondary);
 }
 
 .data-table__primary {
@@ -153,10 +159,19 @@
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: opacity var(--transition);
+  border-color: var(--color-border);
+  color: var(--color-secondary);
+  background-color: var(--color-surface);
 }
 
 .icon-button:hover {
   opacity: 0.75;
+}
+
+/* Destructive action: the label is set by IconButton from the row */
+.icon-button[aria-label^="Eliminar"] {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
 }
 
 /* Forms inside the modals */
@@ -201,17 +216,24 @@
   border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
+  border-color: var(--color-border);
+  color: var(--color-secondary);
+  background-color: var(--color-surface);
 }
 
 .stock-adjust__option--selected {
   border-width: 3px;
   padding: calc(var(--space-2) - 2px);
   font-weight: 700;
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+  background-color: var(--color-primary);
 }
 
 .stock-adjust__option:focus-within {
   outline: 2px solid;
   outline-offset: 2px;
+  outline-color: var(--color-primary);
 }
 
 .stock-adjust__preview {
@@ -239,6 +261,8 @@
   padding: var(--space-4);
   border: 1px solid;
   border-radius: var(--radius-md);
+  border-color: var(--color-border);
+  background-color: var(--color-surface);
 }
 
 .purchase__header {
@@ -265,6 +289,7 @@
   padding: 0 0 var(--space-3);
   border-bottom: 1px solid;
   list-style: none;
+  border-color: var(--color-border);
 }
 
 .purchase__line,
@@ -287,6 +312,7 @@
 
 .purchase__row--total {
   font-weight: 700;
+  color: var(--color-primary);
 }
 
 @media (max-width: 900px) {

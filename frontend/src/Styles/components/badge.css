@@ -8,6 +8,22 @@
   white-space: nowrap;
 }
 
+.badge--neutral {
+  border-color: var(--color-border-strong);
+}
+
+.badge--success {
+  border-color: var(--color-success);
+  background-color: var(--color-success-soft);
+}
+
+/* Amber is too light for text: it colors the border and the background */
+.badge--warning {
+  border-color: var(--color-warning);
+  background-color: var(--color-warning-soft);
+}
+
 .badge--muted {
+  border-color: var(--color-border);
   opacity: 0.6;
 }

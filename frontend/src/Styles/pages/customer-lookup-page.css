@@ -17,12 +17,15 @@
   border: 1px solid;
   border-radius: var(--radius-md);
   font-size: var(--font-size-sm);
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
 }
 
 .lookup__title {
   margin: 0;
   font-size: var(--font-size-xl);
   text-align: center;
+  color: var(--color-primary);
 }
 
 .lookup__subtitle {
@@ -39,6 +42,8 @@
   padding: var(--space-5);
   border: 1px solid;
   border-radius: var(--radius-md);
+  border-color: var(--color-border);
+  background-color: var(--color-surface);
 }
 
 .lookup__form {
@@ -78,6 +83,13 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
+  border-color: var(--color-border);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+}
+
+.lookup__row:hover {
+  border-color: var(--color-primary);
 }
 
 .lookup__row-name {
@@ -104,6 +116,9 @@
   border-radius: 50%;
   font-size: var(--font-size-lg);
   font-weight: 600;
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+  background-color: var(--color-primary);
 }
 
 .customer-card__body {
@@ -115,6 +130,7 @@
 .customer-card__name {
   margin: 0;
   font-size: var(--font-size-lg);
+  color: var(--color-primary);
 }
 
 .customer-card__line {

@@ -9,10 +9,14 @@
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: opacity var(--transition);
+  border-color: var(--color-border);
+  color: var(--color-text);
+  background-color: var(--color-surface);
 }
 
 .product-card:hover:not(.product-card--disabled) {
   opacity: 0.85;
+  border-color: var(--color-primary);
 }
 
 .product-card--disabled {
@@ -50,6 +54,7 @@
 .product-card__price {
   font-size: var(--font-size-lg);
   font-weight: 700;
+  color: var(--color-primary);
 }
 
 .product-card__add {
@@ -62,6 +67,9 @@
   border: 1px solid;
   border-radius: 50%;
   cursor: pointer;
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+  background-color: var(--color-primary);
 }
 
 .product-card__add:disabled {

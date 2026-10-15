@@ -14,9 +14,24 @@
   padding: 10px var(--space-3);
   border: 1px solid;
   border-radius: var(--radius-sm);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+  background-color: var(--color-surface);
 }
 
 .field__hint,
 .field__error {
   font-size: var(--font-size-sm);
+}
+
+.field__control:focus {
+  border-color: var(--color-primary);
+}
+
+.field--error .field__control {
+  border-color: var(--color-danger);
+}
+
+.field__error {
+  color: var(--color-danger);
 }

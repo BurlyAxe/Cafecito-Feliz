@@ -6,6 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-4);
+  background-color: var(--color-overlay);
 }
 
 .modal {
@@ -16,6 +17,8 @@
   border: 1px solid;
   border-radius: var(--radius-md);
   padding: var(--space-5);
+  border-color: var(--color-border);
+  background-color: var(--color-surface);
 }
 
 .modal__header {
@@ -28,6 +31,7 @@
 
 .modal__title {
   font-size: var(--font-size-lg);
+  color: var(--color-primary);
 }
 
 .modal__close {
@@ -35,6 +39,8 @@
   padding: var(--space-1);
   border: 0;
   cursor: pointer;
+  color: var(--color-secondary);
+  background-color: transparent;
 }
 
 .modal__footer {

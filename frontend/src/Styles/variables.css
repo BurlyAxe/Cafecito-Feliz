@@ -1,5 +1,35 @@
-/* Colors pending: palette will be added later */
+/* Palette inspired by Chespin, Perrserker and Ariados */
 :root {
+  /* Base colors: use them only through the semantic tokens below */
+  --palette-forest: #527a45;
+  --palette-steel: #58616b;
+  --palette-cream: #f7f5ef;
+  --palette-carmine: #b83a45;
+  --palette-leaf: #a7c957;
+  --palette-amber: #e7a13d;
+  --palette-silver: #b7bec7;
+
+  /* Semantic tokens */
+  --color-primary: var(--palette-forest);
+  --color-on-primary: var(--palette-cream);
+  --color-primary-soft: color-mix(in srgb, var(--palette-forest) 10%, var(--palette-cream));
+  --color-secondary: var(--palette-steel);
+  --color-on-secondary: var(--palette-cream);
+  --color-background: var(--palette-cream);
+  --color-surface: var(--palette-cream);
+  --color-text: var(--palette-steel);
+  --color-border: var(--palette-silver);
+  --color-border-strong: var(--palette-steel);
+  --color-danger: var(--palette-carmine);
+  --color-on-danger: var(--palette-cream);
+  --color-danger-soft: color-mix(in srgb, var(--palette-carmine) 10%, var(--palette-cream));
+  --color-success: var(--palette-leaf);
+  --color-success-soft: color-mix(in srgb, var(--palette-leaf) 25%, var(--palette-cream));
+  --color-warning: var(--palette-amber);
+  --color-warning-soft: color-mix(in srgb, var(--palette-amber) 25%, var(--palette-cream));
+  --color-neutral-soft: color-mix(in srgb, var(--palette-silver) 25%, var(--palette-cream));
+  --color-overlay: color-mix(in srgb, var(--palette-steel) 55%, transparent);
+
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;

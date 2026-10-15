@@ -6,7 +6,9 @@
   gap: var(--space-3);
   min-height: var(--header-height);
   padding: var(--space-2) var(--space-5);
-  border-bottom: 1px solid;
+  border-bottom: 1px solid var(--color-primary);
+  color: var(--color-on-primary);
+  background-color: var(--color-primary);
 }
 
 .app-header__brand {
@@ -23,6 +25,8 @@
   height: 40px;
   border: 1px solid;
   border-radius: var(--radius-sm);
+  color: var(--color-primary);
+  background-color: var(--color-on-primary);
 }
 
 .app-header__title {
@@ -32,7 +36,7 @@
 
 .app-header__subtitle {
   font-size: var(--font-size-sm);
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 .app-header__actions {
@@ -48,6 +52,7 @@
   gap: var(--space-2);
   font-weight: 600;
   text-decoration: none;
+  color: inherit;
 }
 
 .app-header__role {
@@ -75,6 +80,8 @@
   height: 32px;
   border: 1px solid;
   border-radius: 50%;
+  color: var(--color-primary);
+  background-color: var(--color-on-primary);
   font-size: var(--font-size-sm);
   font-weight: 700;
 }
@@ -92,12 +99,13 @@
 
 .customer-chip__phone {
   font-size: 0.75rem;
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 .customer-chip__change {
   font-size: var(--font-size-sm);
   font-weight: 600;
+  color: inherit;
 }
 
 @media (max-width: 900px) {
